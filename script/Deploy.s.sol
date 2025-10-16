@@ -80,7 +80,7 @@ contract DeployScript is Script {
         console.log("============================================\n");
 
         // Save deployment info to file
-        string memory deploymentInfo = string(
+        string memory header = string(
             abi.encodePacked(
                 "# TuneCent Deployment - Base Sepolia\n\n",
                 "Deployed at: ",
@@ -88,7 +88,12 @@ contract DeployScript is Script {
                 "\n",
                 "Deployer: ",
                 vm.toString(deployer),
-                "\n\n",
+                "\n\n"
+            )
+        );
+
+        string memory addresses = string(
+            abi.encodePacked(
                 "## Contract Addresses\n\n",
                 "- **MusicRegistry**: `",
                 vm.toString(address(musicRegistry)),
@@ -101,7 +106,12 @@ contract DeployScript is Script {
                 "`\n",
                 "- **CrowdfundingPool**: `",
                 vm.toString(address(crowdfundingPool)),
-                "`\n\n",
+                "`\n\n"
+            )
+        );
+
+        string memory verification1 = string(
+            abi.encodePacked(
                 "## Verification Commands\n\n",
                 "```bash\n",
                 "forge verify-contract ",
@@ -109,7 +119,12 @@ contract DeployScript is Script {
                 " src/MusicRegistry.sol:MusicRegistry --chain base-sepolia\n",
                 "forge verify-contract ",
                 vm.toString(address(reputationScore)),
-                " src/ReputationScore.sol:ReputationScore --chain base-sepolia\n",
+                " src/ReputationScore.sol:ReputationScore --chain base-sepolia\n"
+            )
+        );
+
+        string memory verification2 = string(
+            abi.encodePacked(
                 "forge verify-contract ",
                 vm.toString(address(royaltyDistributor)),
                 " src/RoyaltyDistributor.sol:RoyaltyDistributor --chain base-sepolia --constructor-args $(cast abi-encode \"constructor(address,address,address)\" ",
@@ -118,7 +133,12 @@ contract DeployScript is Script {
                 vm.toString(address(reputationScore)),
                 " ",
                 vm.toString(deployer),
-                ")\n",
+                ")\n"
+            )
+        );
+
+        string memory verification3 = string(
+            abi.encodePacked(
                 "forge verify-contract ",
                 vm.toString(address(crowdfundingPool)),
                 " src/CrowdfundingPool.sol:CrowdfundingPool --chain base-sepolia --constructor-args $(cast abi-encode \"constructor(address,address,address)\" ",
@@ -131,6 +151,9 @@ contract DeployScript is Script {
                 "```\n"
             )
         );
+
+        string memory deploymentInfo =
+            string(abi.encodePacked(header, addresses, verification1, verification2, verification3));
 
         vm.writeFile("deployment-info.md", deploymentInfo);
         console.log("Deployment info saved to: deployment-info.md");

@@ -19,6 +19,9 @@ contract TuneCentIntegrationTest is Test {
     address public platform = address(0x4);
     address public platformFee = address(0x5);
 
+    // Allow test contract to receive ETH for platform fees
+    receive() external payable { }
+
     function setUp() public {
         // Deploy contracts
         musicRegistry = new MusicRegistry();
