@@ -43,7 +43,7 @@ contract ReputationScore is Ownable {
     event UpdaterAuthorized(address indexed updater);
     event UpdaterRevoked(address indexed updater);
 
-    constructor() Ownable(msg.sender) {}
+    constructor() Ownable(msg.sender) { }
 
     /**
      * @dev Authorize a contract to update reputation

@@ -69,7 +69,7 @@ contract TuneCentIntegrationTest is Test {
 
         // Platform pays royalty
         vm.startPrank(platform);
-        royaltyDistributor.simulateDetectionPayment{value: 1 ether}(tokenId, "TikTok");
+        royaltyDistributor.simulateDetectionPayment{ value: 1 ether }(tokenId, "TikTok");
         vm.stopPrank();
 
         // Check pending royalties
@@ -110,11 +110,11 @@ contract TuneCentIntegrationTest is Test {
 
         // Fans contribute
         vm.startPrank(fan1);
-        crowdfundingPool.contribute{value: 0.6 ether}(campaignId);
+        crowdfundingPool.contribute{ value: 0.6 ether }(campaignId);
         vm.stopPrank();
 
         vm.startPrank(fan2);
-        crowdfundingPool.contribute{value: 0.4 ether}(campaignId);
+        crowdfundingPool.contribute{ value: 0.4 ether }(campaignId);
         vm.stopPrank();
 
         CrowdfundingPool.Campaign memory campaign = crowdfundingPool.getCampaign(campaignId);

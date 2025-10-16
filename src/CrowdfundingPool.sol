@@ -88,7 +88,11 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
 
     event CampaignCancelled(uint256 indexed campaignId);
 
-    constructor(address _musicRegistry, address payable _royaltyDistributor, address _reputationScore)
+    constructor(
+        address _musicRegistry,
+        address payable _royaltyDistributor,
+        address _reputationScore
+    )
         Ownable(msg.sender)
     {
         require(_musicRegistry != address(0), "Invalid registry address");
@@ -115,7 +119,10 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
         uint256 royaltyPercentage,
         uint256 durationInDays,
         uint256 lockupPeriodInDays
-    ) external returns (uint256) {
+    )
+        external
+        returns (uint256)
+    {
         address owner = musicRegistry.getCurrentOwner(tokenId);
         require(msg.sender == owner, "Only NFT owner can create campaign");
         require(tokenToCampaign[tokenId] == 0, "Campaign already exists for this token");
@@ -166,7 +173,7 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
         contributorAmounts[campaignId][msg.sender] += msg.value;
 
         _contributions[campaignId].push(
-            Contribution({contributor: msg.sender, amount: msg.value, timestamp: block.timestamp})
+            Contribution({ contributor: msg.sender, amount: msg.value, timestamp: block.timestamp })
         );
 
         emit ContributionMade(campaignId, msg.sender, msg.value, campaign.raisedAmount);
@@ -217,10 +224,10 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
         uint256 creatorAmount = campaign.raisedAmount - platformFee;
 
         // Transfer funds
-        (bool success1,) = payable(campaign.creator).call{value: creatorAmount}("");
+        (bool success1,) = payable(campaign.creator).call{ value: creatorAmount }("");
         require(success1, "Transfer to creator failed");
 
-        (bool success2,) = payable(owner()).call{value: platformFee}("");
+        (bool success2,) = payable(owner()).call{ value: platformFee }("");
         require(success2, "Transfer of platform fee failed");
 
         emit FundsWithdrawn(campaignId, campaign.creator, creatorAmount);
@@ -240,7 +247,7 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
 
         contributorAmounts[campaignId][msg.sender] = 0;
 
-        (bool success,) = payable(msg.sender).call{value: contributedAmount}("");
+        (bool success,) = payable(msg.sender).call{ value: contributedAmount }("");
         require(success, "Refund transfer failed");
 
         emit RefundIssued(campaignId, msg.sender, contributedAmount);

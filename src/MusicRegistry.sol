@@ -39,7 +39,7 @@ contract MusicRegistry is ERC721, Ownable {
     event MusicDeactivated(uint256 indexed tokenId);
     event MusicReactivated(uint256 indexed tokenId);
 
-    constructor() ERC721("TuneCent Music Rights", "TCMR") Ownable(msg.sender) {}
+    constructor() ERC721("TuneCent Music Rights", "TCMR") Ownable(msg.sender) { }
 
     /**
      * @dev Register a new music piece with fingerprint
@@ -49,7 +49,12 @@ contract MusicRegistry is ERC721, Ownable {
      * @param artist Artist name
      * @return tokenId The minted NFT token ID
      */
-    function registerMusic(string memory ipfsCID, bytes32 fingerprintHash, string memory title, string memory artist)
+    function registerMusic(
+        string memory ipfsCID,
+        bytes32 fingerprintHash,
+        string memory title,
+        string memory artist
+    )
         external
         returns (uint256)
     {

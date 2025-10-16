@@ -89,7 +89,7 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
         require(totalPercentage == 10000, "Total must be 100%");
 
         _royaltySplits[tokenId] =
-            RoyaltySplit({beneficiaries: beneficiaries, percentages: percentages, isConfigured: true});
+            RoyaltySplit({ beneficiaries: beneficiaries, percentages: percentages, isConfigured: true });
 
         emit RoyaltySplitConfigured(tokenId, beneficiaries, percentages);
     }
@@ -210,7 +210,7 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
      */
     function _transfer(address to, uint256 amount) private {
         require(to != address(0), "Invalid recipient");
-        (bool success,) = payable(to).call{value: amount}("");
+        (bool success,) = payable(to).call{ value: amount }("");
         require(success, "Transfer failed");
     }
 
@@ -252,5 +252,5 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
         return distributedTo[tokenId][beneficiary];
     }
 
-    receive() external payable {}
+    receive() external payable { }
 }
