@@ -22,8 +22,8 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
     }
 
     struct PaymentContext {
-        string platform;      // e.g., "TikTok", "Spotify"
-        string usageType;     // e.g., "video", "stream"
+        string platform; // e.g., "TikTok", "Spotify"
+        string usageType; // e.g., "video", "stream"
         uint256 timestamp;
     }
 
@@ -41,7 +41,7 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
 
     // Default split if not configured (90% creator, 10% platform fee)
     uint256 public constant DEFAULT_CREATOR_PERCENTAGE = 9000; // 90%
-    uint256 public constant PLATFORM_FEE_PERCENTAGE = 1000;    // 10%
+    uint256 public constant PLATFORM_FEE_PERCENTAGE = 1000; // 10%
     address public platformFeeRecipient;
 
     // Minimum royalty amount for distribution
@@ -49,32 +49,16 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
 
     // Events
     event RoyaltyReceived(
-        uint256 indexed tokenId,
-        address indexed from,
-        uint256 amount,
-        string platform,
-        string usageType
+        uint256 indexed tokenId, address indexed from, uint256 amount, string platform, string usageType
     );
 
-    event RoyaltyDistributed(
-        uint256 indexed tokenId,
-        address indexed beneficiary,
-        uint256 amount
-    );
+    event RoyaltyDistributed(uint256 indexed tokenId, address indexed beneficiary, uint256 amount);
 
-    event RoyaltySplitConfigured(
-        uint256 indexed tokenId,
-        address[] beneficiaries,
-        uint256[] percentages
-    );
+    event RoyaltySplitConfigured(uint256 indexed tokenId, address[] beneficiaries, uint256[] percentages);
 
     event PlatformFeeCollected(address indexed recipient, uint256 amount);
 
-    constructor(
-        address _musicRegistry,
-        address _reputationScore,
-        address _platformFeeRecipient
-    ) Ownable(msg.sender) {
+    constructor(address _musicRegistry, address _reputationScore, address _platformFeeRecipient) Ownable(msg.sender) {
         require(_musicRegistry != address(0), "Invalid registry address");
         require(_reputationScore != address(0), "Invalid reputation address");
         require(_platformFeeRecipient != address(0), "Invalid fee recipient");
@@ -90,11 +74,7 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
      * @param beneficiaries Array of beneficiary addresses
      * @param percentages Array of percentages in basis points (must sum to 10000)
      */
-    function setRoyaltySplit(
-        uint256 tokenId,
-        address[] memory beneficiaries,
-        uint256[] memory percentages
-    ) external {
+    function setRoyaltySplit(uint256 tokenId, address[] memory beneficiaries, uint256[] memory percentages) external {
         address owner = musicRegistry.getCurrentOwner(tokenId);
         require(msg.sender == owner, "Only owner can set splits");
         require(beneficiaries.length == percentages.length, "Length mismatch");
@@ -108,11 +88,8 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
         }
         require(totalPercentage == 10000, "Total must be 100%");
 
-        _royaltySplits[tokenId] = RoyaltySplit({
-            beneficiaries: beneficiaries,
-            percentages: percentages,
-            isConfigured: true
-        });
+        _royaltySplits[tokenId] =
+            RoyaltySplit({beneficiaries: beneficiaries, percentages: percentages, isConfigured: true});
 
         emit RoyaltySplitConfigured(tokenId, beneficiaries, percentages);
     }
@@ -123,17 +100,11 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
      * @param platform Platform name (e.g., "TikTok")
      * @param usageType Usage type (e.g., "video", "stream")
      */
-    function payRoyalty(
-        uint256 tokenId,
-        string memory platform,
-        string memory usageType
-    ) external payable {
+    function payRoyalty(uint256 tokenId, string memory platform, string memory usageType) external payable {
         require(msg.value > 0, "Payment must be > 0");
 
         // Verify music exists and is active
-        (bool exists, , address creator) = musicRegistry.verifyFingerprint(
-            _getTokenFingerprint(tokenId)
-        );
+        (bool exists,, address creator) = musicRegistry.verifyFingerprint(_getTokenFingerprint(tokenId));
         require(exists, "Music not found or inactive");
 
         // Add to pending royalties
@@ -193,16 +164,11 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
      * @param tokenId The music NFT token ID
      * @param platform Platform name
      */
-    function simulateDetectionPayment(
-        uint256 tokenId,
-        string memory platform
-    ) external payable {
+    function simulateDetectionPayment(uint256 tokenId, string memory platform) external payable {
         require(msg.value > 0, "Payment must be > 0");
 
         // Verify music exists
-        (bool exists, , ) = musicRegistry.verifyFingerprint(
-            _getTokenFingerprint(tokenId)
-        );
+        (bool exists,,) = musicRegistry.verifyFingerprint(_getTokenFingerprint(tokenId));
         require(exists, "Music not found or inactive");
 
         // Add to pending royalties
@@ -222,11 +188,7 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
     function getRoyaltySplit(uint256 tokenId)
         external
         view
-        returns (
-            address[] memory beneficiaries,
-            uint256[] memory percentages,
-            bool isConfigured
-        )
+        returns (address[] memory beneficiaries, uint256[] memory percentages, bool isConfigured)
     {
         RoyaltySplit memory split = _royaltySplits[tokenId];
         return (split.beneficiaries, split.percentages, split.isConfigured);
@@ -248,7 +210,7 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
      */
     function _transfer(address to, uint256 amount) private {
         require(to != address(0), "Invalid recipient");
-        (bool success, ) = payable(to).call{value: amount}("");
+        (bool success,) = payable(to).call{value: amount}("");
         require(success, "Transfer failed");
     }
 
@@ -286,11 +248,7 @@ contract RoyaltyDistributor is Ownable, ReentrancyGuard {
      * @param beneficiary The beneficiary address
      * @return Distributed amount
      */
-    function getDistributedAmount(uint256 tokenId, address beneficiary)
-        external
-        view
-        returns (uint256)
-    {
+    function getDistributedAmount(uint256 tokenId, address beneficiary) external view returns (uint256) {
         return distributedTo[tokenId][beneficiary];
     }
 

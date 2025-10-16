@@ -13,13 +13,13 @@ contract MusicRegistry is ERC721, Ownable {
     uint256 private _tokenIds;
 
     struct MusicMetadata {
-        string ipfsCID;              // IPFS CID for music metadata
-        bytes32 fingerprintHash;     // Keccak256 hash of audio fingerprint
-        address creator;              // Original creator address
-        uint256 registeredAt;         // Registration timestamp
-        string title;                 // Music title
-        string artist;                // Artist name
-        bool isActive;                // Active status
+        string ipfsCID; // IPFS CID for music metadata
+        bytes32 fingerprintHash; // Keccak256 hash of audio fingerprint
+        address creator; // Original creator address
+        uint256 registeredAt; // Registration timestamp
+        string title; // Music title
+        string artist; // Artist name
+        bool isActive; // Active status
     }
 
     // Mapping from token ID to music metadata
@@ -33,11 +33,7 @@ contract MusicRegistry is ERC721, Ownable {
 
     // Events
     event MusicRegistered(
-        uint256 indexed tokenId,
-        address indexed creator,
-        bytes32 indexed fingerprintHash,
-        string ipfsCID,
-        string title
+        uint256 indexed tokenId, address indexed creator, bytes32 indexed fingerprintHash, string ipfsCID, string title
     );
 
     event MusicDeactivated(uint256 indexed tokenId);
@@ -53,12 +49,10 @@ contract MusicRegistry is ERC721, Ownable {
      * @param artist Artist name
      * @return tokenId The minted NFT token ID
      */
-    function registerMusic(
-        string memory ipfsCID,
-        bytes32 fingerprintHash,
-        string memory title,
-        string memory artist
-    ) external returns (uint256) {
+    function registerMusic(string memory ipfsCID, bytes32 fingerprintHash, string memory title, string memory artist)
+        external
+        returns (uint256)
+    {
         require(bytes(ipfsCID).length > 0, "IPFS CID cannot be empty");
         require(fingerprintHash != bytes32(0), "Fingerprint hash cannot be empty");
         require(bytes(title).length > 0, "Title cannot be empty");
@@ -117,11 +111,7 @@ contract MusicRegistry is ERC721, Ownable {
      * @param tokenId The NFT token ID
      * @return metadata The music metadata struct
      */
-    function getMusicMetadata(uint256 tokenId)
-        external
-        view
-        returns (MusicMetadata memory)
-    {
+    function getMusicMetadata(uint256 tokenId) external view returns (MusicMetadata memory) {
         require(_exists(tokenId), "Token does not exist");
         return _musicData[tokenId];
     }

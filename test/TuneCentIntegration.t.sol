@@ -23,16 +23,9 @@ contract TuneCentIntegrationTest is Test {
         // Deploy contracts
         musicRegistry = new MusicRegistry();
         reputationScore = new ReputationScore();
-        royaltyDistributor = new RoyaltyDistributor(
-            address(musicRegistry),
-            address(reputationScore),
-            platformFee
-        );
-        crowdfundingPool = new CrowdfundingPool(
-            address(musicRegistry),
-            payable(address(royaltyDistributor)),
-            address(reputationScore)
-        );
+        royaltyDistributor = new RoyaltyDistributor(address(musicRegistry), address(reputationScore), platformFee);
+        crowdfundingPool =
+            new CrowdfundingPool(address(musicRegistry), payable(address(royaltyDistributor)), address(reputationScore));
 
         // Authorize contracts to update reputation
         reputationScore.authorizeUpdater(address(musicRegistry));
@@ -54,12 +47,7 @@ contract TuneCentIntegrationTest is Test {
         string memory title = "Test Song";
         string memory artist = "Test Artist";
 
-        uint256 tokenId = musicRegistry.registerMusic(
-            ipfsCID,
-            fingerprint,
-            title,
-            artist
-        );
+        uint256 tokenId = musicRegistry.registerMusic(ipfsCID, fingerprint, title, artist);
 
         assertEq(tokenId, 1);
         assertEq(musicRegistry.ownerOf(tokenId), creator);
@@ -76,12 +64,7 @@ contract TuneCentIntegrationTest is Test {
         // First register music
         vm.startPrank(creator);
         bytes32 fingerprint = keccak256("test_music_2");
-        uint256 tokenId = musicRegistry.registerMusic(
-            "QmTest456",
-            fingerprint,
-            "Song 2",
-            "Artist 2"
-        );
+        uint256 tokenId = musicRegistry.registerMusic("QmTest456", fingerprint, "Song 2", "Artist 2");
         vm.stopPrank();
 
         // Platform pays royalty
@@ -111,20 +94,15 @@ contract TuneCentIntegrationTest is Test {
         // Register music first
         vm.startPrank(creator);
         bytes32 fingerprint = keccak256("test_music_3");
-        uint256 tokenId = musicRegistry.registerMusic(
-            "QmTest789",
-            fingerprint,
-            "Song 3",
-            "Artist 3"
-        );
+        uint256 tokenId = musicRegistry.registerMusic("QmTest789", fingerprint, "Song 3", "Artist 3");
 
         // Create campaign: 1 ETH goal, 20% royalty share, 7 days duration
         uint256 campaignId = crowdfundingPool.createCampaign(
             tokenId,
-            1 ether,              // goal
-            2000,                 // 20% royalty
-            7,                    // 7 days duration
-            30                    // 30 days lock-up
+            1 ether, // goal
+            2000, // 20% royalty
+            7, // 7 days duration
+            30 // 30 days lock-up
         );
         vm.stopPrank();
 
@@ -141,7 +119,7 @@ contract TuneCentIntegrationTest is Test {
 
         CrowdfundingPool.Campaign memory campaign = crowdfundingPool.getCampaign(campaignId);
         assertEq(campaign.raisedAmount, 1 ether);
-        assertEq(uint(campaign.status), 0); // Active
+        assertEq(uint256(campaign.status), 0); // Active
 
         // Fast forward past deadline
         vm.warp(block.timestamp + 8 days);
@@ -150,7 +128,7 @@ contract TuneCentIntegrationTest is Test {
         crowdfundingPool.finalizeCampaign(campaignId);
 
         campaign = crowdfundingPool.getCampaign(campaignId);
-        assertEq(uint(campaign.status), 1); // Successful
+        assertEq(uint256(campaign.status), 1); // Successful
 
         // Creator withdraws funds
         uint256 creatorBalanceBefore = creator.balance;
@@ -167,13 +145,10 @@ contract TuneCentIntegrationTest is Test {
         vm.startPrank(creator);
 
         // Register multiple works
-        for (uint i = 0; i < 3; i++) {
+        for (uint256 i = 0; i < 3; i++) {
             bytes32 fingerprint = keccak256(abi.encodePacked("music_", i));
             musicRegistry.registerMusic(
-                string(abi.encodePacked("QmTest", i)),
-                fingerprint,
-                string(abi.encodePacked("Song ", i)),
-                "Artist"
+                string(abi.encodePacked("QmTest", i)), fingerprint, string(abi.encodePacked("Song ", i)), "Artist"
             );
         }
 
@@ -198,21 +173,11 @@ contract TuneCentIntegrationTest is Test {
 
         bytes32 fingerprint = keccak256("duplicate_test");
 
-        musicRegistry.registerMusic(
-            "QmTest1",
-            fingerprint,
-            "Song 1",
-            "Artist"
-        );
+        musicRegistry.registerMusic("QmTest1", fingerprint, "Song 1", "Artist");
 
         // This should revert
         vm.expectRevert("Fingerprint already registered");
-        musicRegistry.registerMusic(
-            "QmTest2",
-            fingerprint,
-            "Song 2",
-            "Artist"
-        );
+        musicRegistry.registerMusic("QmTest2", fingerprint, "Song 2", "Artist");
 
         vm.stopPrank();
     }

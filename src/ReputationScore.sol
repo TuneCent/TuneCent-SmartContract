@@ -10,13 +10,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract ReputationScore is Ownable {
     struct CreatorStats {
-        uint256 totalWorks;           // Number of registered works
-        uint256 totalEarnings;         // Lifetime earnings in wei
-        uint256 totalContributions;    // Amount received from crowdfunding
-        uint256 successfulCampaigns;   // Number of successful crowdfunding campaigns
-        uint256 reputationScore;       // Calculated reputation score (0-10000)
-        uint256 lastUpdated;           // Last update timestamp
-        bool isVerified;               // Verification status
+        uint256 totalWorks; // Number of registered works
+        uint256 totalEarnings; // Lifetime earnings in wei
+        uint256 totalContributions; // Amount received from crowdfunding
+        uint256 successfulCampaigns; // Number of successful crowdfunding campaigns
+        uint256 reputationScore; // Calculated reputation score (0-10000)
+        uint256 lastUpdated; // Last update timestamp
+        bool isVerified; // Verification status
     }
 
     // Mapping from creator address to stats
@@ -26,22 +26,17 @@ contract ReputationScore is Ownable {
     mapping(address => bool) public authorizedUpdaters;
 
     // Reputation calculation weights
-    uint256 public constant WORKS_WEIGHT = 1000;        // 10%
-    uint256 public constant EARNINGS_WEIGHT = 4000;      // 40%
+    uint256 public constant WORKS_WEIGHT = 1000; // 10%
+    uint256 public constant EARNINGS_WEIGHT = 4000; // 40%
     uint256 public constant CONTRIBUTIONS_WEIGHT = 3000; // 30%
-    uint256 public constant CAMPAIGNS_WEIGHT = 2000;     // 20%
+    uint256 public constant CAMPAIGNS_WEIGHT = 2000; // 20%
 
     // Scaling factors for calculations
     uint256 public constant EARNINGS_SCALE = 1 ether;
     uint256 public constant MAX_SCORE = 10000;
 
     // Events
-    event ReputationUpdated(
-        address indexed creator,
-        uint256 newScore,
-        uint256 totalWorks,
-        uint256 totalEarnings
-    );
+    event ReputationUpdated(address indexed creator, uint256 newScore, uint256 totalWorks, uint256 totalEarnings);
 
     event CreatorVerified(address indexed creator);
     event CreatorUnverified(address indexed creator);
@@ -70,10 +65,7 @@ contract ReputationScore is Ownable {
     }
 
     modifier onlyAuthorized() {
-        require(
-            authorizedUpdaters[msg.sender] || msg.sender == owner(),
-            "Not authorized"
-        );
+        require(authorizedUpdaters[msg.sender] || msg.sender == owner(), "Not authorized");
         _;
     }
 
@@ -158,11 +150,7 @@ contract ReputationScore is Ownable {
      * @param creator Creator address
      * @return stats Creator statistics
      */
-    function getCreatorStats(address creator)
-        external
-        view
-        returns (CreatorStats memory)
-    {
+    function getCreatorStats(address creator) external view returns (CreatorStats memory) {
         return _creatorStats[creator];
     }
 
@@ -199,10 +187,8 @@ contract ReputationScore is Ownable {
 
         // Weighted average
         uint256 newScore = (
-            (worksScore * WORKS_WEIGHT) +
-            (earningsScore * EARNINGS_WEIGHT) +
-            (contributionsScore * CONTRIBUTIONS_WEIGHT) +
-            (campaignsScore * CAMPAIGNS_WEIGHT)
+            (worksScore * WORKS_WEIGHT) + (earningsScore * EARNINGS_WEIGHT)
+                + (contributionsScore * CONTRIBUTIONS_WEIGHT) + (campaignsScore * CAMPAIGNS_WEIGHT)
         ) / MAX_SCORE;
 
         // Cap at MAX_SCORE
@@ -212,12 +198,7 @@ contract ReputationScore is Ownable {
 
         stats.reputationScore = newScore;
 
-        emit ReputationUpdated(
-            creator,
-            newScore,
-            stats.totalWorks,
-            stats.totalEarnings
-        );
+        emit ReputationUpdated(creator, newScore, stats.totalWorks, stats.totalEarnings);
     }
 
     /**
@@ -285,12 +266,7 @@ contract ReputationScore is Ownable {
     function getScoreBreakdown(address creator)
         external
         view
-        returns (
-            uint256 works,
-            uint256 earnings,
-            uint256 contributions,
-            uint256 campaigns
-        )
+        returns (uint256 works, uint256 earnings, uint256 contributions, uint256 campaigns)
     {
         CreatorStats memory stats = _creatorStats[creator];
 

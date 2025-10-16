@@ -45,11 +45,8 @@ contract DeployScript is Script {
 
         // 4. Deploy CrowdfundingPool
         console.log("\n4. Deploying CrowdfundingPool...");
-        CrowdfundingPool crowdfundingPool = new CrowdfundingPool(
-            address(musicRegistry),
-            payable(address(royaltyDistributor)),
-            address(reputationScore)
-        );
+        CrowdfundingPool crowdfundingPool =
+            new CrowdfundingPool(address(musicRegistry), payable(address(royaltyDistributor)), address(reputationScore));
         console.log("CrowdfundingPool deployed at:", address(crowdfundingPool));
 
         // 5. Configure contract permissions
@@ -83,23 +80,57 @@ contract DeployScript is Script {
         console.log("============================================\n");
 
         // Save deployment info to file
-        string memory deploymentInfo = string(abi.encodePacked(
-            "# TuneCent Deployment - Base Sepolia\n\n",
-            "Deployed at: ", vm.toString(block.timestamp), "\n",
-            "Deployer: ", vm.toString(deployer), "\n\n",
-            "## Contract Addresses\n\n",
-            "- **MusicRegistry**: `", vm.toString(address(musicRegistry)), "`\n",
-            "- **ReputationScore**: `", vm.toString(address(reputationScore)), "`\n",
-            "- **RoyaltyDistributor**: `", vm.toString(address(royaltyDistributor)), "`\n",
-            "- **CrowdfundingPool**: `", vm.toString(address(crowdfundingPool)), "`\n\n",
-            "## Verification Commands\n\n",
-            "```bash\n",
-            "forge verify-contract ", vm.toString(address(musicRegistry)), " src/MusicRegistry.sol:MusicRegistry --chain base-sepolia\n",
-            "forge verify-contract ", vm.toString(address(reputationScore)), " src/ReputationScore.sol:ReputationScore --chain base-sepolia\n",
-            "forge verify-contract ", vm.toString(address(royaltyDistributor)), " src/RoyaltyDistributor.sol:RoyaltyDistributor --chain base-sepolia --constructor-args $(cast abi-encode \"constructor(address,address,address)\" ", vm.toString(address(musicRegistry)), " ", vm.toString(address(reputationScore)), " ", vm.toString(deployer), ")\n",
-            "forge verify-contract ", vm.toString(address(crowdfundingPool)), " src/CrowdfundingPool.sol:CrowdfundingPool --chain base-sepolia --constructor-args $(cast abi-encode \"constructor(address,address,address)\" ", vm.toString(address(musicRegistry)), " ", vm.toString(address(royaltyDistributor)), " ", vm.toString(address(reputationScore)), ")\n",
-            "```\n"
-        ));
+        string memory deploymentInfo = string(
+            abi.encodePacked(
+                "# TuneCent Deployment - Base Sepolia\n\n",
+                "Deployed at: ",
+                vm.toString(block.timestamp),
+                "\n",
+                "Deployer: ",
+                vm.toString(deployer),
+                "\n\n",
+                "## Contract Addresses\n\n",
+                "- **MusicRegistry**: `",
+                vm.toString(address(musicRegistry)),
+                "`\n",
+                "- **ReputationScore**: `",
+                vm.toString(address(reputationScore)),
+                "`\n",
+                "- **RoyaltyDistributor**: `",
+                vm.toString(address(royaltyDistributor)),
+                "`\n",
+                "- **CrowdfundingPool**: `",
+                vm.toString(address(crowdfundingPool)),
+                "`\n\n",
+                "## Verification Commands\n\n",
+                "```bash\n",
+                "forge verify-contract ",
+                vm.toString(address(musicRegistry)),
+                " src/MusicRegistry.sol:MusicRegistry --chain base-sepolia\n",
+                "forge verify-contract ",
+                vm.toString(address(reputationScore)),
+                " src/ReputationScore.sol:ReputationScore --chain base-sepolia\n",
+                "forge verify-contract ",
+                vm.toString(address(royaltyDistributor)),
+                " src/RoyaltyDistributor.sol:RoyaltyDistributor --chain base-sepolia --constructor-args $(cast abi-encode \"constructor(address,address,address)\" ",
+                vm.toString(address(musicRegistry)),
+                " ",
+                vm.toString(address(reputationScore)),
+                " ",
+                vm.toString(deployer),
+                ")\n",
+                "forge verify-contract ",
+                vm.toString(address(crowdfundingPool)),
+                " src/CrowdfundingPool.sol:CrowdfundingPool --chain base-sepolia --constructor-args $(cast abi-encode \"constructor(address,address,address)\" ",
+                vm.toString(address(musicRegistry)),
+                " ",
+                vm.toString(address(royaltyDistributor)),
+                " ",
+                vm.toString(address(reputationScore)),
+                ")\n",
+                "```\n"
+            )
+        );
 
         vm.writeFile("deployment-info.md", deploymentInfo);
         console.log("Deployment info saved to: deployment-info.md");

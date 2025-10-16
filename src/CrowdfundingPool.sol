@@ -26,13 +26,13 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
     }
 
     struct Campaign {
-        uint256 tokenId;                 // Associated music NFT token ID
-        address creator;                 // Campaign creator
-        uint256 goalAmount;              // Funding goal in wei
-        uint256 raisedAmount;            // Amount raised so far
-        uint256 royaltyPercentage;       // Percentage of royalties offered (in basis points)
-        uint256 deadline;                // Campaign deadline timestamp
-        uint256 lockupPeriod;            // Lock-up period in seconds
+        uint256 tokenId; // Associated music NFT token ID
+        address creator; // Campaign creator
+        uint256 goalAmount; // Funding goal in wei
+        uint256 raisedAmount; // Amount raised so far
+        uint256 royaltyPercentage; // Percentage of royalties offered (in basis points)
+        uint256 deadline; // Campaign deadline timestamp
+        uint256 lockupPeriod; // Lock-up period in seconds
         CampaignStatus status;
         bool fundsWithdrawn;
         uint256 createdAt;
@@ -77,37 +77,20 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
     );
 
     event ContributionMade(
-        uint256 indexed campaignId,
-        address indexed contributor,
-        uint256 amount,
-        uint256 totalRaised
+        uint256 indexed campaignId, address indexed contributor, uint256 amount, uint256 totalRaised
     );
 
-    event CampaignFinalized(
-        uint256 indexed campaignId,
-        bool successful,
-        uint256 totalRaised
-    );
+    event CampaignFinalized(uint256 indexed campaignId, bool successful, uint256 totalRaised);
 
-    event FundsWithdrawn(
-        uint256 indexed campaignId,
-        address indexed creator,
-        uint256 amount
-    );
+    event FundsWithdrawn(uint256 indexed campaignId, address indexed creator, uint256 amount);
 
-    event RefundIssued(
-        uint256 indexed campaignId,
-        address indexed contributor,
-        uint256 amount
-    );
+    event RefundIssued(uint256 indexed campaignId, address indexed contributor, uint256 amount);
 
     event CampaignCancelled(uint256 indexed campaignId);
 
-    constructor(
-        address _musicRegistry,
-        address payable _royaltyDistributor,
-        address _reputationScore
-    ) Ownable(msg.sender) {
+    constructor(address _musicRegistry, address payable _royaltyDistributor, address _reputationScore)
+        Ownable(msg.sender)
+    {
         require(_musicRegistry != address(0), "Invalid registry address");
         require(_royaltyDistributor != address(0), "Invalid distributor address");
         require(_reputationScore != address(0), "Invalid reputation address");
@@ -161,14 +144,7 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
 
         tokenToCampaign[tokenId] = campaignId;
 
-        emit CampaignCreated(
-            campaignId,
-            tokenId,
-            msg.sender,
-            goalAmount,
-            royaltyPercentage,
-            block.timestamp + duration
-        );
+        emit CampaignCreated(campaignId, tokenId, msg.sender, goalAmount, royaltyPercentage, block.timestamp + duration);
 
         return campaignId;
     }
@@ -189,18 +165,11 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
         campaign.raisedAmount += msg.value;
         contributorAmounts[campaignId][msg.sender] += msg.value;
 
-        _contributions[campaignId].push(Contribution({
-            contributor: msg.sender,
-            amount: msg.value,
-            timestamp: block.timestamp
-        }));
-
-        emit ContributionMade(
-            campaignId,
-            msg.sender,
-            msg.value,
-            campaign.raisedAmount
+        _contributions[campaignId].push(
+            Contribution({contributor: msg.sender, amount: msg.value, timestamp: block.timestamp})
         );
+
+        emit ContributionMade(campaignId, msg.sender, msg.value, campaign.raisedAmount);
     }
 
     /**
@@ -227,11 +196,7 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
             campaign.status = CampaignStatus.Failed;
         }
 
-        emit CampaignFinalized(
-            campaignId,
-            campaign.status == CampaignStatus.Successful,
-            campaign.raisedAmount
-        );
+        emit CampaignFinalized(campaignId, campaign.status == CampaignStatus.Successful, campaign.raisedAmount);
     }
 
     /**
@@ -252,10 +217,10 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
         uint256 creatorAmount = campaign.raisedAmount - platformFee;
 
         // Transfer funds
-        (bool success1, ) = payable(campaign.creator).call{value: creatorAmount}("");
+        (bool success1,) = payable(campaign.creator).call{value: creatorAmount}("");
         require(success1, "Transfer to creator failed");
 
-        (bool success2, ) = payable(owner()).call{value: platformFee}("");
+        (bool success2,) = payable(owner()).call{value: platformFee}("");
         require(success2, "Transfer of platform fee failed");
 
         emit FundsWithdrawn(campaignId, campaign.creator, creatorAmount);
@@ -275,7 +240,7 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
 
         contributorAmounts[campaignId][msg.sender] = 0;
 
-        (bool success, ) = payable(msg.sender).call{value: contributedAmount}("");
+        (bool success,) = payable(msg.sender).call{value: contributedAmount}("");
         require(success, "Refund transfer failed");
 
         emit RefundIssued(campaignId, msg.sender, contributedAmount);
@@ -302,11 +267,7 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
      * @param campaignId The campaign ID
      * @return campaign The campaign struct
      */
-    function getCampaign(uint256 campaignId)
-        external
-        view
-        returns (Campaign memory)
-    {
+    function getCampaign(uint256 campaignId) external view returns (Campaign memory) {
         return campaigns[campaignId];
     }
 
@@ -315,11 +276,7 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
      * @param campaignId The campaign ID
      * @return contributions Array of contributions
      */
-    function getContributions(uint256 campaignId)
-        external
-        view
-        returns (Contribution[] memory)
-    {
+    function getContributions(uint256 campaignId) external view returns (Contribution[] memory) {
         return _contributions[campaignId];
     }
 
@@ -329,11 +286,7 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
      * @param contributor Contributor address
      * @return sharePercentage Share percentage in basis points
      */
-    function getContributionShare(uint256 campaignId, address contributor)
-        external
-        view
-        returns (uint256)
-    {
+    function getContributionShare(uint256 campaignId, address contributor) external view returns (uint256) {
         Campaign memory campaign = campaigns[campaignId];
         uint256 contributedAmount = contributorAmounts[campaignId][contributor];
 
@@ -374,7 +327,8 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
         // Calculate proportional splits for contributors
         for (uint256 i = 0; i < contributions.length; i++) {
             address contributor = contributions[i].contributor;
-            uint256 contributorShare = (contributorAmounts[campaignId][contributor] * campaign.royaltyPercentage) / campaign.raisedAmount;
+            uint256 contributorShare =
+                (contributorAmounts[campaignId][contributor] * campaign.royaltyPercentage) / campaign.raisedAmount;
 
             beneficiaries[i + 1] = contributor;
             percentages[i + 1] = contributorShare;
