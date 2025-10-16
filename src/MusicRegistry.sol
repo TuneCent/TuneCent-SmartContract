@@ -49,12 +49,7 @@ contract MusicRegistry is ERC721, Ownable {
      * @param artist Artist name
      * @return tokenId The minted NFT token ID
      */
-    function registerMusic(
-        string memory ipfsCID,
-        bytes32 fingerprintHash,
-        string memory title,
-        string memory artist
-    )
+    function registerMusic(string memory ipfsCID, bytes32 fingerprintHash, string memory title, string memory artist)
         external
         returns (uint256)
     {

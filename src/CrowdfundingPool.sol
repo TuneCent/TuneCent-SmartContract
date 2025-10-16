@@ -88,11 +88,7 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
 
     event CampaignCancelled(uint256 indexed campaignId);
 
-    constructor(
-        address _musicRegistry,
-        address payable _royaltyDistributor,
-        address _reputationScore
-    )
+    constructor(address _musicRegistry, address payable _royaltyDistributor, address _reputationScore)
         Ownable(msg.sender)
     {
         require(_musicRegistry != address(0), "Invalid registry address");
@@ -172,9 +168,8 @@ contract CrowdfundingPool is Ownable, ReentrancyGuard {
         campaign.raisedAmount += msg.value;
         contributorAmounts[campaignId][msg.sender] += msg.value;
 
-        _contributions[campaignId].push(
-            Contribution({ contributor: msg.sender, amount: msg.value, timestamp: block.timestamp })
-        );
+        _contributions[campaignId]
+        .push(Contribution({ contributor: msg.sender, amount: msg.value, timestamp: block.timestamp }));
 
         emit ContributionMade(campaignId, msg.sender, msg.value, campaign.raisedAmount);
     }

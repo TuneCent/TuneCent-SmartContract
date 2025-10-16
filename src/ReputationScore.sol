@@ -186,10 +186,11 @@ contract ReputationScore is Ownable {
         uint256 campaignsScore = _calculateCampaignsScore(stats.successfulCampaigns);
 
         // Weighted average
-        uint256 newScore = (
-            (worksScore * WORKS_WEIGHT) + (earningsScore * EARNINGS_WEIGHT)
-                + (contributionsScore * CONTRIBUTIONS_WEIGHT) + (campaignsScore * CAMPAIGNS_WEIGHT)
-        ) / MAX_SCORE;
+        uint256 newScore =
+            ((worksScore * WORKS_WEIGHT)
+                + (earningsScore * EARNINGS_WEIGHT)
+                + (contributionsScore * CONTRIBUTIONS_WEIGHT)
+                + (campaignsScore * CAMPAIGNS_WEIGHT)) / MAX_SCORE;
 
         // Cap at MAX_SCORE
         if (newScore > MAX_SCORE) {
